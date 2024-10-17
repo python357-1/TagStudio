@@ -73,7 +73,8 @@ Translation services provided via [Weblate](https://hosted.weblate.org/projects/
 
 ## Installation
 
-To download TagStudio, visit the [Releases](https://github.com/TagStudioDev/TagStudio/releases) section of the GitHub repository and download the latest release for your system under the "Assets" section. TagStudio is available for **Windows**, **macOS** _(Apple Silicon & Intel)_, and **Linux**. Windows and Linux builds are also available in portable versions if you want a more self-contained executable to move around.
+> [!CAUTION]
+> The **only** official source of TagStudio is GitHub. Any packages, such as on the AUR or other package managers, are not official, and you download them at your own risk.
 
 For video thumbnails and playback, you'll also need [FFmpeg](https://ffmpeg.org/download.html) installed on your system.
 
