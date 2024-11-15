@@ -92,6 +92,8 @@ from src.qt.widgets.preview_panel import PreviewPanel
 from src.qt.widgets.progress import ProgressWidget
 from src.qt.widgets.thumb_renderer import ThumbRenderer
 
+from ..core.media_types import MediaCategories
+
 # SIGQUIT is not defined on Windows
 if sys.platform == "win32":
     from signal import SIGINT, SIGTERM, signal
@@ -444,6 +446,8 @@ class QtDriver(DriverMixin, QObject):
         menu_bar.addMenu(macros_menu)
         menu_bar.addMenu(window_menu)
         menu_bar.addMenu(help_menu)
+
+        self.main_window.searchField.textChanged.connect(self.update_completions_list)
 
         self.preview_panel = PreviewPanel(self.lib, self)
         splitter = self.main_window.splitter
@@ -947,6 +951,51 @@ class QtDriver(DriverMixin, QObject):
 
     def set_macro_menu_viability(self):
         self.autofill_action.setDisabled(not self.selected)
+
+    def update_completions_list(self, text: str) -> None:
+        # the last thing in the string, and the thing we will be trying to complete
+        completion = text.lower().rstrip().split(" ")[-1].split(":")[0]
+        print(completion)
+        completion_list: list[str] = []
+        update_completion_list: bool = False
+
+        if completion == "tag":
+            print("tag search")
+            completion_list = list(map(lambda x: "tag:" + x.name, self.lib.tags))
+            update_completion_list = True
+        elif completion == "tag_id":
+            print("tag id search")
+            completion_list = list(map(lambda x: "tag_id:" + str(x.id), self.lib.tags))
+            update_completion_list = True
+        elif completion == "path":
+            glob = text.lower().rstrip().split(" ")[-1].split(":")[-1]
+            completion_list = list(
+                map(lambda x: "path:" + x, self.lib.get_paths(glob=(glob + "*")))
+            )
+            update_completion_list = True
+        elif completion == "mediatype":
+            print("mediatype search") # for debugging
+            completion_list = list(
+                map(lambda x: 'mediatype:"' + x.name + '"', MediaCategories.ALL_CATEGORIES)
+            )
+            update_completion_list = True
+        elif completion == "filetype":
+            filetypes_list: set[str] = set()
+            for mediatype in MediaCategories.ALL_CATEGORIES:
+                filetypes_list = filetypes_list | mediatype.extensions
+            completion_list = list(map(lambda x: "filetype:" + x.replace(".", ""), filetypes_list))
+            update_completion_list = True
+
+        if update_completion_list:
+            print("updating completion list with following data")
+            x = 0
+            for item in completion_list:
+                if x > 10:
+                    print("truncating " + str(len(completion_list) - 10) + " results.")
+                    break
+                print(item)
+                x += 1
+            self.main_window.searchFieldCompletionList.setStringList(completion_list)
 
     def update_thumbs(self):
         """Update search thumbnails."""
