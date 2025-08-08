@@ -913,6 +913,10 @@ class Library:
                     sort_on = func.lower(Entry.filename)
                 case SortingModeEnum.PATH:
                     sort_on = func.lower(Entry.path)
+                case SortingModeEnum.DATE_CREATED:
+                    sort_on = func.lower(Entry.date_created)
+                case SortingModeEnum.DATE_MODIFIED:
+                    sort_on = func.lower(Entry.date_modified)
 
             statement = statement.order_by(asc(sort_on) if search.ascending else desc(sort_on))
             if page_size is not None:
